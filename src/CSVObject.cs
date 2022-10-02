@@ -67,7 +67,7 @@ namespace LightCSV
             return result;
         }
 
-        /// <summary>Gets the position of a string value in (row, column) format.</summary>
+        /// <summary>Gets the position of a string value in (row, column) format. Returns (-1, -1) if the entry is not found in the CSV data.</summary>
         /// <param name="entry">The string value to get the position of.</param>
         public (int, int) GetPosition(string entry)
         {
