@@ -44,3 +44,22 @@ class Program
     }
 }
 ```
+
+## Some Considerations
+LightCSV is liberal in what it accepts as values. The following values will be read accordingly:
+
+```
+ 1 2 3 ,"hello!", testing...
+```
+
+```
+" 1 2 3 "
+"hello!"
+" testing..."
+```
+
+However, LightCSV will not accept values that include line breaks ('\n'). 
+
+Some other limitations include:
+- Separation character cannot be `' '`, `''`, or `'"'`
+- File/string as parsing source cannot be empty
