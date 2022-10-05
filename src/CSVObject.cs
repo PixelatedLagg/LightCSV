@@ -1,3 +1,5 @@
+using System.Text;
+
 namespace LightCSV
 {
     /// <summary>Stores/handles CSV parsing operations.</summary>
@@ -94,35 +96,60 @@ namespace LightCSV
         /// <param name="separationChar">The character that separates each value (default for CSV is of course ',').</param>
         public static CSVObject Parse(string csv, char separationChar = ',')
         {
-            string[] lines = csv.Split("\n"), headers = lines[0].Split(separationChar);
-            string[,] entries = new string[lines.Length, headers.Length];
-            for (int i = 0; i < headers.Length; i++)
+            int width = 1;
+            string[] lines = csv.Split('\n');
+            for (int i = 0; i < lines[0].Length; i++)
             {
-                string entry = headers[i].Trim();
-                if (entry[0] == '"')
+                switch (lines[0][i])
                 {
-                    entries[0, i] = entry.Substring(1, entry.Length - 2);
-                }
-                else
-                {
-                    entries[0, i] = entry;
+                    case '"':
+                        while (lines[0][i] != '"')
+                        {
+                            i++;
+                        }
+                        break;
+                    default:
+                        if (lines[0][i] == separationChar)
+                        {
+                            width++;
+                        }
+                        break;
                 }
             }
-            for (int i = 1; i < lines.Length; i++)
+            string[,] entries = new string[lines.Length, width];
+            int valueIndex = 0;
+            StringBuilder token = new StringBuilder();
+            for (int i = 0; i < lines.Length; i++)
             {
-                string[] values = lines[i].Split(separationChar);
-                for (int j = 0; j < values.Length; j++)
+                for (int j = 0; j < lines[i].Length; j++)
                 {
-                    string entry = values[j].Trim();
-                    if (entry[0] == '"')
+                    switch (lines[i][j])
                     {
-                        entries[i, j] = entry.Substring(1, entry.Length - 2);
-                    }
-                    else
-                    {
-                        entries[i, j] = entry;
+                        case '"':
+                            j++;
+                            while (lines[i][j] != '"')
+                            {
+                                token.Append(lines[i][j]);
+                                j++;
+                            }
+                            break;
+                        default:
+                            if (lines[i][j] == separationChar)
+                            {
+                                entries[i, valueIndex] = token.ToString();
+                                token.Clear();
+                                valueIndex++;
+                            }
+                            else
+                            {
+                                token.Append(lines[i][j]);
+                            }
+                            break;
                     }
                 }
+                entries[i, valueIndex] = token.ToString();
+                token.Clear();
+                valueIndex = 0;
             }
             return new CSVObject(entries);
         }
